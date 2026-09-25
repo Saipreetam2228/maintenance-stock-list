@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nandigiri Campus · Maintenance Stock Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#12161c;--bg2:#181e26;--card:#1f2732;--line:#33404f;--tx:#e8edf3;--mut:#93a1b2;--acc:#f5b301;--ok:#2fb573;--bad:#e5484d;--rep:#4c8dff;--new:#22b8cf;--lost:#9b7bff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef1f4;--bg2:#fff;--card:#fff;--line:#cfd7e0;--tx:#1a2330;--mut:#5d6b7d}}
+:root[data-theme="light"]{--bg:#eef1f4;--bg2:#fff;--card:#fff;--line:#cfd7e0;--tx:#1a2330;--mut:#5d6b7d}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px 'IBM Plex Sans',system-ui,sans-serif;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--bg2);border-bottom:1px solid var(--line);position:relative;padding:12px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:4px;background:repeating-linear-gradient(-45deg,var(--acc) 0 10px,#111 10px 20px)}
+.brand{flex:1;min-width:220px}.brand small{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--acc);text-transform:uppercase}
+.brand h1{margin:0;font:700 26px 'Barlow Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button{font:600 13px 'IBM Plex Sans',sans-serif;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--acc)}button.pri{background:var(--acc);color:#111;border-color:var(--acc)}
+main{flex:1;display:flex;min-height:0}
+#canvas{flex:1;overflow:auto;padding:32px;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px}
+#wrap{position:relative;display:inline-block;min-width:100%}
+#svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.branch{display:flex;align-items:center;position:relative}
+.kids{display:flex;flex-direction:column;gap:14px;margin-left:64px}
+.node{position:relative;display:flex;align-items:center;gap:10px;min-width:190px;max-width:290px;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:8px;padding:9px 10px;cursor:pointer;box-shadow:0 2px 8px #0003}
+.node:hover{border-color:var(--c)}.node.sel{outline:2px solid var(--c);outline-offset:2px}
+.ic{color:var(--c);font-size:16px}.tx{flex:1;min-width:0}
+.tx b{display:block;font:600 17px 'Barlow Condensed',sans-serif;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx small{color:var(--mut);font:500 11px 'IBM Plex Mono',monospace}
+.chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.chip{font:500 11px 'IBM Plex Mono',monospace;padding:1px 5px;border-radius:4px;background:#0003;border:1px solid var(--line)}
+.c-working{color:var(--ok)}.c-damaged{color:var(--bad)}.c-repaired{color:var(--rep)}.c-new{color:var(--new)}.c-lost{color:var(--lost)}
+.rb{width:24px;height:24px;padding:0;border-radius:50%;font-size:14px;line-height:1;flex:none}
+.rb.add{background:var(--c);color:#111;border-color:var(--c);font-size:17px}
+.pop{position:absolute;left:100%;top:50%;transform:translate(8px,-50%);z-index:5;background:var(--bg2);border:1px solid var(--acc);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:4px;width:170px}
+.pop button{text-align:left;font-size:12px}
+aside{width:330px;background:var(--bg2);border-left:1px solid var(--line);overflow:auto;padding:16px;flex:none}
+aside h2{font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;margin:0 0 12px;color:var(--acc)}
+label{display:block;font:600 11px 'IBM Plex Mono',monospace;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 5px}
+input[type=text],input[type=number]{width:100%;background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--tx);padding:8px 10px;font:500 14px 'IBM Plex Sans',sans-serif}
+input:focus{outline:2px solid var(--acc);border-color:transparent}
+.seg{display:flex}.seg button{flex:1;border-radius:0}.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0}.seg .on{background:var(--acc);color:#111;border-color:var(--acc)}
+.sw{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.sw i{width:26px;height:26px;border-radius:6px;cursor:pointer;border:2px solid transparent}.sw i.on{border-color:var(--tx)}
+.sw input{width:34px;height:28px;padding:0;border:0;background:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid label{margin:0 0 3px}
+table{width:100%;border-collapse:collapse;font:500 12px 'IBM Plex Mono',monospace;margin-top:6px}
+th,td{padding:5px 4px;text-align:right;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left;font-family:'IBM Plex Sans',sans-serif}
+th{color:var(--mut);font-size:10px}tfoot td{font-weight:700;border-top:2px solid var(--acc)}
+.del{width:100%;margin-top:18px;color:var(--bad);border-color:var(--bad)}.del.arm{background:var(--bad);color:#fff}
+.hint{color:var(--mut);line-height:1.6}
+@media(max-width:800px){aside{position:fixed;left:0;right:0;bottom:0;width:auto;max-height:58vh;border-top:2px solid var(--acc);z-index:9}#canvas{padding:18px 18px 40vh}}
+</style></head><body>
+<header>
+ <div class="brand"><small>Nandigiri Campus · Maintenance Dept.</small><h1>Stock Register</h1></div>
+ <div class="tools"><button class="pri" id="ex">Expand all</button><button id="co">Collapse all</button><button id="th">Theme</button><button id="rs">Reset sample</button></div>
+</header>
+<main><div id="canvas"><div id="wrap"><svg id="svg"></svg><div id="tree"></div></div></div>
+<aside id="panel"></aside></main>
+<script>
+const ST=['working','damaged','repaired','new','lost'],LB={working:'Working',damaged:'Damaged',repaired:'Repaired',new:'New',lost:'Lost'},SH={working:'W',damaged:'D',repaired:'R',new:'N',lost:'L'};
+const COL=['#f5b301','#ff7a1a','#e5484d','#2fb573','#22b8cf','#4c8dff','#9b7bff','#8a97a8'];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const G=(name,color,children=[])=>({id:uid(),name,type:'group',color,children});
+const I=(name,w,d,r,n,l)=>({id:uid(),name,type:'item',color:'#f5b301',st:{working:w,damaged:d,repaired:r,new:n,lost:l},children:[]});
+function seed(){return G('Nandigiri Campus','#f5b301',[
+ G('Institute','#4c8dff',[G('Ground Floor','#4c8dff',[G('G1','#22b8cf',[I('Bulbs',12,3,2,4,0),I('Fans',8,1,1,0,0)]),G('G2','#22b8cf',[I('Bulbs',10,2,1,0,1),I('Fans',6,2,0,1,0)])])]),
+ G('Hostel','#ff7a1a',[G('First Floor','#ff7a1a',[G('Room 101','#2fb573',[I('Bulbs',4,1,0,1,0),I('Fans',2,0,1,0,0)])]),G('Tools Store','#9b7bff',[I('Screwdriver sets',5,0,1,2,1)])])])}
+let S,sel=null,addFor=null,armDel=false;
+try{S=JSON.parse(localStorage.getItem('nc-stock'))}catch(e){}
+S=S||seed();
+const save=()=>{try{localStorage.setItem('nc-stock',JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function find(id,n=S,p=null){if(n.id===id)return{n,p};for(const c of n.children){const r=find(id,c,n);if(r)return r}return null}
+function agg(n,a={}){if(n.type==='item'){const k=n.name.trim().toLowerCase();const o=a[k]||(a[k]={name:n.name.trim(),working:0,damaged:0,repaired:0,new:0,lost:0});ST.forEach(s=>o[s]+=+n.st[s]||0)}else n.children.forEach(c=>agg(c,a));return a}
+const sum=n=>{const t={working:0,damaged:0,repaired:0,new:0,lost:0};Object.values(agg(n)).forEach(o=>ST.forEach(s=>t[s]+=o[s]));return t};
+const tot=t=>ST.reduce((a,s)=>a+t[s],0);
+function branch(n){
+ const t=n.type==='item'?n.st:sum(n),has=n.children.length;
+ const sub=n.type==='item'?'<div class="chips">'+ST.map(s=>`<span class="chip c-${s}" title="${LB[s]}">${SH[s]} ${+t[s]||0}</span>`).join('')+'</div>':`<small>${tot(t)} units${t.damaged?` · <span class="c-damaged">${t.damaged} damaged</span>`:''}</small>`;
+ let h=`<div class="branch" data-b="${n.id}"><div class="node${sel===n.id?' sel':''}" data-id="${n.id}" style="--c:${n.color}"><span class="ic">${n.type==='item'?'◆':'▣'}</span><div class="tx"><b>${esc(n.name)}</b>${sub}</div>`;
+ if(has)h+=`<button class="rb" data-a="tg" title="Collapse / expand">${n.collapsed?has:'‹'}</button>`;
+ if(n.type==='group')h+=`<button class="rb add" data-a="add" title="Add inside">+</button>`;
+ if(addFor===n.id)h+=`<div class="pop"><button data-a="mk" data-t="group">▣ Place / floor / room</button><button data-a="mk" data-t="item">◆ Stock item</button></div>`;
+ h+='</div>';
+ if(has&&!n.collapsed)h+=`<div class="kids">${n.children.map(branch).join('')}</div>`;
+ return h+'</div>'}
+function render(){document.getElementById('tree').innerHTML=branch(S);requestAnimationFrame(links)}
+function links(){
+ const w=document.getElementById('wrap'),W=w.getBoundingClientRect(),svg=document.getElementById('svg');let p='';
+ w.querySelectorAll('.branch').forEach(b=>{const k=b.querySelector(':scope>.kids');if(!k)return;
+  const a=b.querySelector(':scope>.node').getBoundingClientRect(),x1=a.right-W.left,y1=a.top+a.height/2-W.top;
+  k.querySelectorAll(':scope>.branch>.node').forEach(c=>{const r=c.getBoundingClientRect(),x2=r.left-W.left,y2=r.top+r.height/2-W.top,m=(x1+x2)/2;
+   p+=`<path d="M${x1} ${y1}C${m} ${y1} ${m} ${y2} ${x2} ${y2}" stroke="${c.style.getPropertyValue('--c')}" stroke-width="2" fill="none" opacity=".75"/>`})});
+ svg.innerHTML=p}
+function panel(){
+ const el=document.getElementById('panel'),r=sel&&find(sel);
+ if(!r){el.innerHTML='<h2>Details</h2><p class="hint">Click any box to edit it here.<br>Use <b>+</b> on a place to add floors, rooms or stock items — as deep as you need.<br>Totals roll up automatically at every level.</p>';return}
+ const n=r.n,item=n.type==='item';
+ el.innerHTML=`<h2>${item?'Stock item':'Place'}</h2>
+ <label>Name</label><input type="text" id="nm" value="${esc(n.name)}">
+ ${n.children.length?'':`<label>Type</label><div class="seg"><button data-a="ty" data-t="group" class="${item?'':'on'}">Place</button><button data-a="ty" data-t="item" class="${item?'on':''}">Item</button></div>`}
+ <label>Colour</label><div class="sw">${COL.map(c=>`<i data-a="cl" data-c="${c}" style="background:${c}" class="${n.color===c?'on':''}"></i>`).join('')}<input type="color" id="cp" value="${n.color}"></div>
+ ${item?`<label>Counts</label><div class="grid">${ST.map(s=>`<div><label class="c-${s}">${LB[s]}</label><input type="number" min="0" data-s="${s}" value="${n.st[s]||0}"></div>`).join('')}</div>`:''}
+ <div id="sm"></div>
+ ${r.p?`<button class="del" id="dl">${armDel?'Click again to delete':'Delete'+(n.children.length?' with everything inside':'')}</button>`:''}`;
+ summ()}
+function summ(){
+ const r=sel&&find(sel),el=document.getElementById('sm');if(!r||!el)return;
+ const a=Object.values(agg(r.n)),t=sum(r.n);
+ el.innerHTML=a.length?`<label>Roll-up · ${esc(r.n.name)}</label><table><thead><tr><th>Item</th>${ST.map(s=>`<th class="c-${s}">${SH[s]}</th>`).join('')}<th>Σ</th></tr></thead><tbody>${a.map(o=>`<tr><td>${esc(o.name)}</td>${ST.map(s=>`<td>${o[s]}</td>`).join('')}<td>${tot(o)}</td></tr>`).join('')}</tbody><tfoot><tr><td>Total</td>${ST.map(s=>`<td>${t[s]}</td>`).join('')}<td>${tot(t)}</td></tr></tfoot></table><p class="hint" style="font-size:11px">W working · D damaged · R repaired · N new · L lost</p>`:''}
+function pick(id){sel=id;armDel=false;addFor=null;render();panel()}
+document.getElementById('tree').addEventListener('click',e=>{
+ const a=e.target.closest('[data-a]'),nd=e.target.closest('.node');if(!nd){addFor=null;render();return}
+ const id=nd.dataset.id,n=find(id).n;
+ if(a){e.stopPropagation();const k=a.dataset.a;
+  if(k==='tg'){n.collapsed=!n.collapsed;save();render();return}
+  if(k==='add'){addFor=addFor===id?null:id;render();return}
+  if(k==='mk'){const it=a.dataset.t==='item',c=it?I('New item',0,0,0,0,0):G('New place',n.color);n.children.push(c);n.collapsed=false;addFor=null;save();pick(c.id);const i=document.getElementById('nm');i.focus();i.select();return}}
+ pick(id)});
+document.getElementById('canvas').addEventListener('click',e=>{if(e.target.id==='canvas'||e.target.id==='wrap'){addFor=null;render()}});
+const P=document.getElementById('panel');
+P.addEventListener('input',e=>{const r=find(sel);if(!r)return;const n=r.n,t=e.target;
+ if(t.id==='nm')n.name=t.value||' ';
+ else if(t.id==='cp')n.color=t.value;
+ else if(t.dataset.s)n.st[t.dataset.s]=Math.max(0,parseInt(t.value)||0);
+ else return;save();render();summ()});
+P.addEventListener('click',e=>{const a=e.target.closest('[data-a],#dl');if(!a)return;const r=find(sel);if(!r)return;const n=r.n;
+ if(a.id==='dl'){if(!armDel){armDel=true;panel();return}r.p.children=r.p.children.filter(c=>c.id!==n.id);sel=null;armDel=false;save();render();panel();return}
+ const k=a.dataset.a;
+ if(k==='cl')n.color=a.dataset.c;
+ if(k==='ty'){n.type=a.dataset.t;if(n.type==='item'&&!n.st)n.st={working:0,damaged:0,repaired:0,new:0,lost:0}}
+ save();render();panel()});
+const setAll=(n,v)=>{if(n.children.length&&n!==S)n.collapsed=v;n.children.forEach(c=>setAll(c,v))};
+document.getElementById('ex').onclick=()=>{setAll(S,false);S.collapsed=false;save();render()};
+document.getElementById('co').onclick=()=>{setAll(S,true);S.collapsed=false;save();render()};
+document.getElementById('rs').onclick=()=>{if(confirm('Replace all data with the sample data?')){S=seed();sel=null;save();render();panel()}};
+document.getElementById('th').onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue('--bg').trim()==='#12161c';d.dataset.theme=dark?'light':'dark'};
+addEventListener('resize',links);document.fonts&&document.fonts.ready.then(links);
+render();panel();
+</script></body></html>
